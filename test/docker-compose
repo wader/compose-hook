@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$1" = "logs" ] ; then
+  while true ; do
+    echo logs
+    sleep 0.2
+  done
+else
+  echo $1
+fi

@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -e
+
+git checkout -qb test
+git commit -qma --allow-empty
+git push -q --all origin 2>&1
+git push -q --delete origin test 2>&1
+exit
+
+EXPECTED
+remote: compose-hook: test: compose-hook.yml not found

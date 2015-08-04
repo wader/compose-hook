@@ -1,0 +1,74 @@
+#!/usr/bin/env bash
+set -e
+set -o pipefail
+
+if [ "$1" = "" ] ; then
+  echo "Usage: compose-book-binary tests-dir [test]"
+  exit
+fi
+
+COMPOSE_HOOK="$1"
+TESTS_DIR="$2"
+TEMP_DIR=$(mktemp -dt compose-testXXXXX)
+
+function run_test() {
+  REMOTE_DIR="$TEMP_DIR/remote"
+  LOCAL_DIR="$TEMP_DIR/local"
+
+  rm -rf "$REMOTE_DIR" "$LOCAL_DIR"
+
+  COMPOSE_HOOK_ARGS=""
+  eval $(grep COMPOSE_HOOK_ARGS $TESTS_DIR/$1)
+
+  COMPOSE_HOOK_VIA_ARGS=""
+  eval $(grep COMPOSE_HOOK_VIA_ARGS $TESTS_DIR/$1)
+
+  # setup empty "remote" repo with hook
+  mkdir "$REMOTE_DIR"
+  cd "$REMOTE_DIR"
+  git --bare init -q .
+  if [ "$COMPOSE_HOOK_VIA_ARGS" = "1" ] ; then
+    echo -e "#!/bin/sh\nwhile read old new ref ; do PATH=$TESTS_DIR:\$PATH $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$old \$new \$ref ; done" > hooks/pre-receive
+  else
+    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH $COMPOSE_HOOK $COMPOSE_HOOK_ARGS" > hooks/pre-receive
+  fi
+  chmod +x hooks/pre-receive
+
+  # setup empty "local" repo to run test and push from
+  mkdir "$LOCAL_DIR"
+  cd "$LOCAL_DIR"
+  git init -q .
+  git remote add origin "$REMOTE_DIR"
+
+  echo -n "$1... "
+
+  # remove some git warnings and temp dir lines
+  # trim line to fix weird trailing whitespace git remote behaviour
+  "$TESTS_DIR/$1" \
+    | sed 's/ *$//' \
+    | (grep -v "remote: warning: You appear to have cloned an empty repository." || true) \
+    | (grep -v "$TEMP_DIR" || true) \
+    > "$TEMP_DIR/actual"
+  grep -A 1000 EXPECTED "$TESTS_DIR/$1" | tail -n+2 > "$TEMP_DIR/expected"
+
+  if cmp -s "$TEMP_DIR/actual" "$TEMP_DIR/expected" ; then
+    echo "PASS"
+  else
+    echo "FAILED"
+    ls -l "$TEMP_DIR/actual" "$TEMP_DIR/expected"
+    echo "=== actual:"
+    cat "$TEMP_DIR/actual"
+    echo "=== expected:"
+    cat "$TEMP_DIR/expected"
+  fi
+}
+
+if [ "$3" != "" ] ; then
+  run_test "$3"
+else
+  for t in $(cd $TESTS_DIR; echo test_*) ; do
+     run_test "$t"
+  done
+fi
+
+rm -rf "$TEMP_DIR"

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+git commit -qma --allow-empty
+git push --all -q origin 2>&1
+exit
+
+EXPECTED
+remote: compose-hook: master: compose-hook.yml not found

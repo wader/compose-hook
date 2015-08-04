@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -e
+
+cat << EOF > compose-hook.yml
+master:
+  project: a
+  tail_log: 0.5s
+EOF
+git add compose-hook.yml
+git commit -qma
+git push --all -q origin 2>&1
+exit
+
+EXPECTED
+remote: compose-hook: master COMPOSE_PROJECT_NAME=a
+remote: compose-hook: docker-compose pull
+remote: pull
+remote: compose-hook: docker-compose build
+remote: build
+remote: compose-hook: docker-compose up -d
+remote: up
+remote: compose-hook: docker-compose logs --no-color
+remote: logs
+remote: logs
+remote: logs
