@@ -38,6 +38,8 @@ function run_test() {
   mkdir "$LOCAL_DIR"
   cd "$LOCAL_DIR"
   git init -q .
+  git config user.name "test"
+  git config user.email "test@test.com"
   git remote add origin "$REMOTE_DIR"
 
   echo -n "$1... "
