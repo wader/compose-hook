@@ -7,6 +7,9 @@ if [ "$1" = "" ] ; then
   exit
 fi
 
+# Fix for old git version that add control codes in remote stdout output
+export TERM=dumb
+
 COMPOSE_HOOK="$1"
 TESTS_DIR="$2"
 TEMP_DIR=$(mktemp -dt compose-testXXXXX)
