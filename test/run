@@ -10,6 +10,7 @@ fi
 COMPOSE_HOOK="$1"
 TESTS_DIR="$2"
 TEMP_DIR=$(mktemp -dt compose-testXXXXX)
+FAILED=0
 
 function run_test() {
   REMOTE_DIR="$TEMP_DIR/remote"
@@ -62,6 +63,7 @@ function run_test() {
     cat "$TEMP_DIR/actual"
     echo "=== expected:"
     cat "$TEMP_DIR/expected"
+    FAILED=1
   fi
 }
 
@@ -74,3 +76,7 @@ else
 fi
 
 rm -rf "$TEMP_DIR"
+
+if [ "$FAILED" = "1" ] ; then
+  exit 1
+fi
