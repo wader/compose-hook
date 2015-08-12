@@ -7,9 +7,6 @@ if [ "$1" = "" ] ; then
   exit
 fi
 
-# Fix for old git version that add control codes in remote stdout output
-export TERM=dumb
-
 COMPOSE_HOOK="$1"
 TESTS_DIR="$2"
 TEMP_DIR=$(mktemp -dt compose-testXXXXX)
@@ -50,7 +47,8 @@ function run_test() {
 
   # remove some git warnings and temp dir lines
   # trim line to fix weird trailing whitespace git remote behaviour
-  "$TESTS_DIR/$1" \
+  # dumb term to stop old git versions that add control codes in remote stdout output
+  TERM=dumb "$TESTS_DIR/$1" \
     | sed 's/ *$//' \
     | (grep -v "remote: warning: You appear to have cloned an empty repository." || true) \
     | (grep -v "$TEMP_DIR" || true) \
