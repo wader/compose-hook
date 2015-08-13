@@ -22,6 +22,7 @@ master: # branch name
   skip_build: false # optional
   skip_up: false # optional
   tail_log: 5s # optional, duration to tail conatiner logs after up
+  smart_recreate: false # optional, use up --x-smart-recreate
 
 testing: # some other branch name
   # ...

@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -e
+
+cat << EOF > compose-hook.yml
+master:
+  project: a
+  smart_recreate: true
+EOF
+git add compose-hook.yml
+git commit -qma
+git push --all -q origin 2>&1
+exit
+
+EXPECTED
+remote: compose-hook: master COMPOSE_PROJECT_NAME=a
+remote: compose-hook: docker-compose pull
+remote: pull
+remote: compose-hook: docker-compose build
+remote: build
+remote: compose-hook: docker-compose up -d --x-smart-recreate
+remote: up -d --x-smart-recreate

@@ -22,12 +22,13 @@ var composeHookFile = flag.String("config", "compose-hook.yml", "compose-hook co
 
 type branchConfigs map[string]branchConfig
 type branchConfig struct {
-	File      string
-	Project   string
-	SkipPull  bool          `yaml:"skip_pull"`
-	SkipBuild bool          `yaml:"skip_build"`
-	SkipUp    bool          `yaml:"skip_up"`
-	Taillog   time.Duration `yaml:"tail_log"`
+	File          string
+	Project       string
+	SkipPull      bool          `yaml:"skip_pull"`
+	SkipBuild     bool          `yaml:"skip_build"`
+	SkipUp        bool          `yaml:"skip_up"`
+	Taillog       time.Duration `yaml:"tail_log"`
+	SmartRecreate bool          `yaml:"smart_recreate"`
 }
 
 func logf(format string, a ...interface{}) {
@@ -196,7 +197,11 @@ func (ch *composeHook) processPreReceiveWithConfig(hashPath string, pr *preRecei
 	// re(create) containers and (re)start them if needed
 	// smart recreate: https://github.com/docker/compose/pull/1399
 	if !config.SkipUp {
-		c := exec.Command("docker-compose", "up" /*"--x-smart-recreate",*/, "-d")
+		cmds := []string{"docker-compose", "up", "-d"}
+		if config.SmartRecreate {
+			cmds = append(cmds, "--x-smart-recreate")
+		}
+		c := exec.Command(cmds[0], cmds[1:]...)
 		c.Dir = hashPath
 		c.Env = env
 		if err := runCmd(c, 0); err != nil {
