@@ -6,5 +6,5 @@ if [ "$1" = "logs" ] ; then
     sleep 0.2
   done
 else
-  echo $1
+  echo $*
 fi

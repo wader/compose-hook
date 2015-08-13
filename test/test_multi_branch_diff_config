@@ -24,11 +24,11 @@ remote: pull
 remote: compose-hook: docker-compose build
 remote: build
 remote: compose-hook: docker-compose up -d
-remote: up
+remote: up -d
 remote: compose-hook: test COMPOSE_PROJECT_NAME=b
 remote: compose-hook: docker-compose pull
 remote: pull
 remote: compose-hook: docker-compose build
 remote: build
 remote: compose-hook: docker-compose up -d
-remote: up
+remote: up -d

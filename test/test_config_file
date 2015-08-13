@@ -18,4 +18,4 @@ remote: pull
 remote: compose-hook: docker-compose build
 remote: build
 remote: compose-hook: docker-compose up -d
-remote: up
+remote: up -d

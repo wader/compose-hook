@@ -16,4 +16,4 @@ remote: compose-hook: master COMPOSE_PROJECT_NAME=a
 remote: compose-hook: docker-compose build
 remote: build
 remote: compose-hook: docker-compose up -d
-remote: up
+remote: up -d
