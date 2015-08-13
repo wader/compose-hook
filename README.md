@@ -18,10 +18,10 @@ Add a `compose-hook.yml` file to your git repo.
 master: # branch name
   project: webapp # required
   file: docker-compose_dev.yml # optionl
-  skip_pull: true # optional
-  skip_build: true # optional
-  skip_up: true # optional
-  tail_log: 5s # optional
+  skip_pull: false # optional
+  skip_build: false # optional
+  skip_up: false # optional
+  tail_log: 5s # optional, duration to tail conatiner logs after up
 
 testing: # some other branch name
   # ...
