@@ -74,10 +74,17 @@ func newPreReceiveFromLine(line string) (*preReceive, error) {
 	}, nil
 }
 
+func (pr preReceive) refType() string {
+	// revName looks like "refs/<type>/test"
+	parts := strings.SplitN(pr.refName, "/", 3)
+	// ["refs" "<type>" "<..>"]
+	return parts[1]
+}
+
 func (pr preReceive) branchName() string {
 	// revName looks like "refs/heads/<branch>"
 	parts := strings.SplitN(pr.refName, "/", 3)
-	// ["refs" "heads" "<branch>/..."]
+	// ["refs" "heads" "<branch>""]
 	return parts[2]
 }
 
@@ -223,7 +230,9 @@ func (ch *composeHook) processPreReceiveWithConfig(hashPath string, pr *preRecei
 }
 
 func (ch *composeHook) processPreReceive(pr *preReceive) error {
-	if pr.newHash == deleteBranchHash {
+	// ignore non-branch (tags) and deleted branch
+	if pr.refType() != "heads" ||
+		pr.newHash == deleteBranchHash {
 		return nil
 	}
 

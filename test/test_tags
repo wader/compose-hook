@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -e
+
+git commit -qma --allow-empty
+git tag test
+git push -q --tags origin 2>&1
+exit
+
+EXPECTED
