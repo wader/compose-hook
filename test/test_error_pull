@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -e
+
+MOCK_COMPOSE_FAIL_COMMAND=pull
+
+cat << EOF > compose-hook.yml
+master:
+  project: a
+EOF
+git add compose-hook.yml
+git commit -qma
+git push --all -q origin 2>&1
+exit
+
+EXPECTED
+remote: compose-hook: master COMPOSE_PROJECT_NAME=a
+remote: compose-hook: docker-compose pull
+remote: compose-hook: exit status 1
+ ! [remote rejected] master -> master (pre-receive hook declined)

@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ "$MOCK_COMPOSE_FAIL_COMMAND" = "$1" ] ; then
+  exit 1
+fi
+
 if [ "$1" = "logs" ] ; then
   while true ; do
     echo logs

@@ -21,6 +21,9 @@ function run_test() {
   COMPOSE_HOOK_ARGS=""
   eval $(grep COMPOSE_HOOK_ARGS $TESTS_DIR/$1)
 
+  MOCK_COMPOSE_FAIL_COMMAND=""
+  eval $(grep MOCK_COMPOSE_FAIL_COMMAND $TESTS_DIR/$1)
+
   COMPOSE_HOOK_VIA_ARGS=""
   eval $(grep COMPOSE_HOOK_VIA_ARGS $TESTS_DIR/$1)
 
@@ -31,7 +34,7 @@ function run_test() {
   if [ "$COMPOSE_HOOK_VIA_ARGS" = "1" ] ; then
     echo -e "#!/bin/sh\nwhile read old new ref ; do PATH=$TESTS_DIR:\$PATH $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$old \$new \$ref ; done" > hooks/pre-receive
   else
-    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH $COMPOSE_HOOK $COMPOSE_HOOK_ARGS" > hooks/pre-receive
+    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS" > hooks/pre-receive
   fi
   chmod +x hooks/pre-receive
 
