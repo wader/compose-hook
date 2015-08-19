@@ -12,6 +12,8 @@ Use `compose-hook` directly as a pre-receive/post-receive symlink or call it fro
 
 Add a `compose-hook.yml` file to your git repo.
 
+On push `compose-hook` will look for a configuration file for each pushed branch and run pull, build for configured branches.
+
 ### Configuration
 
 ```yaml
