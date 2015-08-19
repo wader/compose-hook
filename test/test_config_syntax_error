@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+cat << EOF > compose-hook.yml
+bla
+EOF
+git add compose-hook.yml
+git commit -qma
+git push --all -q origin 2>&1
+exit
+
+EXPECTED
+remote: compose-hook: yaml: unmarshal errors:
+remote:   line 1: cannot unmarshal !!str `bla` into main.branchConfigs
+ ! [remote rejected] master -> master (pre-receive hook declined)
