@@ -51,6 +51,7 @@ function run_test() {
   # remove some git warnings and temp dir lines
   # trim line to fix weird trailing whitespace git remote behaviour
   # dumb term to stop old git versions that add control codes in remote stdout output
+  # https://github.com/git/git/commits/master/sideband.c
   (TERM=dumb "$TESTS_DIR/$1" || true) \
     | sed 's/ *$//' \
     | (grep -v "remote: warning: You appear to have cloned an empty repository." || true) \
