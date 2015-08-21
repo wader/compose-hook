@@ -1,6 +1,6 @@
 ### compose-hook
 
-git pre-receive/post-receive docker-compose hook.
+git docker-compose hook.
 
 ### Install
 
