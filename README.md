@@ -12,7 +12,7 @@ Use `compose-hook` directly as a pre-receive/post-receive symlink or call it fro
 
 Add a `compose-hook.yml` file to your git repo.
 
-On push `compose-hook` will look for a configuration file for each pushed branch and run pull, build for configured branches.
+On push `compose-hook` will look for the configuration file for each pushed branch and run pull, build for configured branches.
 
 ### Configuration
 
@@ -38,7 +38,7 @@ To use in pre-receive/post-receive hook script:
 ```sh
 while read old new ref ; do
   # do other stuff etc
-  compose-hook $old $new $ref
+  compose-hook "$old" "$new" "$ref"
 done
 ```
 
@@ -61,7 +61,7 @@ Add config to cleanup images and containers.
 
 Wildcard branch name https://github.com/docker/compose/pull/1765. Export branch name?
 
-Option to stop on remove branch? look for config in old commit.
+Option to stop on remove branch? look for config in previous (^1 ?) commit.
 
 ### License
 
