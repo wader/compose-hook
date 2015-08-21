@@ -42,6 +42,13 @@ while read old new ref ; do
 done
 ```
 
+To use in update hook script:
+
+```sh
+compose-hook "$2" "$3" "$1"
+
+```
+
 Currenrly `tail_log` does not work because of https://github.com/docker/compose/issues/1838
 
 Use `--config` to use another filenamn than `compose-hook.yml`.

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-COMPOSE_HOOK_VIA_ARGS=1
+GIT_HOOK_INVOKE_HOW=pre-receive-args
 
 cat << EOF > compose-hook.yml
 master:

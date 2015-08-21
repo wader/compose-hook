@@ -21,22 +21,27 @@ function run_test() {
   COMPOSE_HOOK_ARGS=""
   eval $(grep COMPOSE_HOOK_ARGS $TESTS_DIR/$1)
 
+  # passed as env to mock docker-compose to make commands fail
   MOCK_COMPOSE_FAIL_COMMAND=""
   eval $(grep MOCK_COMPOSE_FAIL_COMMAND $TESTS_DIR/$1)
-
-  COMPOSE_HOOK_VIA_ARGS=""
-  eval $(grep COMPOSE_HOOK_VIA_ARGS $TESTS_DIR/$1)
+  # how compose-hook should be invoked
+  GIT_HOOK_INVOKE_HOW="pre-receive-stdin"
+  eval $(grep GIT_HOOK_INVOKE_HOW $TESTS_DIR/$1)
 
   # setup empty "remote" repo with hook
   mkdir "$REMOTE_DIR"
   cd "$REMOTE_DIR"
   git --bare init -q .
-  if [ "$COMPOSE_HOOK_VIA_ARGS" = "1" ] ; then
-    echo -e "#!/bin/sh\nwhile read old new ref ; do PATH=$TESTS_DIR:\$PATH $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$old \$new \$ref ; done" > hooks/pre-receive
-  else
+  if [ "$GIT_HOOK_INVOKE_HOW" = "pre-receive-stdin" ] ; then
     echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS" > hooks/pre-receive
+    chmod +x hooks/pre-receive
+  elif [ "$GIT_HOOK_INVOKE_HOW" = "pre-receive-args" ] ; then
+    echo -e "#!/bin/sh\nwhile read old new ref ; do PATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$old \$new \$ref ; done" > hooks/pre-receive
+    chmod +x hooks/pre-receive
+  elif [ "$GIT_HOOK_INVOKE_HOW" = "update-args" ] ; then
+    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$2 \$3 \$1" > hooks/update
+    chmod +x hooks/update
   fi
-  chmod +x hooks/pre-receive
 
   # setup empty "local" repo to run test and push from
   mkdir "$LOCAL_DIR"
