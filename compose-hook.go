@@ -77,6 +77,9 @@ func newPreReceiveFromLine(line string) (*preReceive, error) {
 func (pr preReceive) refType() string {
 	// revName looks like "refs/<type>/test"
 	parts := strings.SplitN(pr.refName, "/", 3)
+	if len(parts) != 3 {
+		return ""
+	}
 	// ["refs" "<type>" "<..>"]
 	return parts[1]
 }
@@ -84,6 +87,9 @@ func (pr preReceive) refType() string {
 func (pr preReceive) branchName() string {
 	// revName looks like "refs/heads/<branch>"
 	parts := strings.SplitN(pr.refName, "/", 3)
+	if len(parts) != 3 {
+		return ""
+	}
 	// ["refs" "heads" "<branch>""]
 	return parts[2]
 }
