@@ -28,7 +28,7 @@ type branchConfig struct {
 	SkipBuild     bool          `yaml:"skip_build"`
 	SkipUp        bool          `yaml:"skip_up"`
 	Taillog       time.Duration `yaml:"tail_log"`
-	SmartRecreate bool          `yaml:"smart_recreate"`
+	ForceRecreate bool          `yaml:"force-recreate"`
 }
 
 func logf(format string, a ...interface{}) {
@@ -208,11 +208,10 @@ func (ch *composeHook) processPreReceiveWithConfig(hashPath string, pr *preRecei
 	}
 
 	// re(create) containers and (re)start them if needed
-	// smart recreate: https://github.com/docker/compose/pull/1399
 	if !config.SkipUp {
 		cmds := []string{"docker-compose", "up", "-d"}
-		if config.SmartRecreate {
-			cmds = append(cmds, "--x-smart-recreate")
+		if config.ForceRecreate {
+			cmds = append(cmds, "--force-recreate")
 		}
 		c := exec.Command(cmds[0], cmds[1:]...)
 		c.Dir = hashPath

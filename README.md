@@ -1,10 +1,12 @@
 ### compose-hook
 
-git docker-compose hook.
+git hook for running docker-compose.
 
 ### Install
 
     go get -u github.com/wader/compose-hook
+
+Requires docker-compose version 1.4.0 or higher.
 
 ### Usage:
 
@@ -23,8 +25,8 @@ master: # branch name
   skip_pull: false # optional
   skip_build: false # optional
   skip_up: false # optional
-  tail_log: 5s # optional, duration to tail conatiner logs after up
-  smart_recreate: false # optional, use up --x-smart-recreate
+  tail_log: 0s # optional, duration to tail conatiner logs after up, e.g. 5s
+  force_recreate: false # optional, use up --force-recreate
 
 testing: # some other branch name
   # ...
