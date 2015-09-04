@@ -4,6 +4,8 @@ go:
   - 1.4
   - tip
 
-script:
+install:
+  - go get github.com/wadey/gocovmerge
   - go get
-  - test/run compose-hook $PWD/test
+script:
+  - test/run

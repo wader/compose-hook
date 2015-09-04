@@ -11,4 +11,3 @@ exit
 
 EXPECTED
 remote: compose-hook: master: no project name
- ! [remote rejected] master -> master (pre-receive hook declined)

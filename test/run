@@ -2,21 +2,19 @@
 set -e
 set -o pipefail
 
-if [ "$1" = "" ] ; then
-  echo "Usage: compose-book-binary tests-dir [test]"
-  exit
-fi
-
-COMPOSE_HOOK="$1"
-TESTS_DIR="$2"
+RUN_DIR="$PWD"
+TESTS_DIR="$RUN_DIR/test"
+COMPOSE_HOOK="$RUN_DIR/compose-hook.test"
 TEMP_DIR=$(mktemp -dt compose-testXXXXX)
 FAILED=0
+COVER_DIR="$TEMP_DIR/cover"
 
 function run_test() {
   REMOTE_DIR="$TEMP_DIR/remote"
   LOCAL_DIR="$TEMP_DIR/local"
 
   rm -rf "$REMOTE_DIR" "$LOCAL_DIR"
+  mkdir -p "$COVER_DIR"
 
   COMPOSE_HOOK_ARGS=""
   eval $(grep COMPOSE_HOOK_ARGS $TESTS_DIR/$1)
@@ -33,13 +31,13 @@ function run_test() {
   cd "$REMOTE_DIR"
   git --bare init -q .
   if [ "$GIT_HOOK_INVOKE_HOW" = "pre-receive-stdin" ] ; then
-    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS" > hooks/pre-receive
+    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK -test.coverprofile $COVER_DIR/$1.out -- $COMPOSE_HOOK_ARGS" > hooks/pre-receive
     chmod +x hooks/pre-receive
   elif [ "$GIT_HOOK_INVOKE_HOW" = "pre-receive-args" ] ; then
-    echo -e "#!/bin/sh\nwhile read old new ref ; do PATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$old \$new \$ref ; done" > hooks/pre-receive
+    echo -e "#!/bin/sh\nwhile read old new ref ; do PATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK -test.coverprofile $COVER_DIR/$1.out -- $COMPOSE_HOOK_ARGS \$old \$new \$ref ; done" > hooks/pre-receive
     chmod +x hooks/pre-receive
   elif [ "$GIT_HOOK_INVOKE_HOW" = "update-args" ] ; then
-    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK $COMPOSE_HOOK_ARGS \$2 \$3 \$1" > hooks/update
+    echo -e "#!/bin/sh\nPATH=$TESTS_DIR:\$PATH MOCK_COMPOSE_FAIL_COMMAND=$MOCK_COMPOSE_FAIL_COMMAND $COMPOSE_HOOK -test.coverprofile $COVER_DIR/$1.out -- $COMPOSE_HOOK_ARGS \$2 \$3 \$1" > hooks/update
     chmod +x hooks/update
   fi
 
@@ -59,6 +57,8 @@ function run_test() {
   # https://github.com/git/git/commits/master/sideband.c
   (TERM=dumb "$TESTS_DIR/$1" || true) \
     | sed 's/ *$//' \
+    | (grep -v "coverage:" || true) \
+    | (grep -v "PASS" || true) \
     | (grep -v "remote: warning: You appear to have cloned an empty repository." || true) \
     | (grep -v "$TEMP_DIR" || true) \
     > "$TEMP_DIR/actual"
@@ -77,6 +77,9 @@ function run_test() {
   fi
 }
 
+go build
+go test -cover -c -o compose-hook.test
+
 if [ "$3" != "" ] ; then
   run_test "$3"
 else
@@ -84,6 +87,10 @@ else
      run_test "$t"
   done
 fi
+
+gocovmerge "$COVER_DIR"/*.out > "$RUN_DIR/coverage.out"
+go tool cover "-html=$RUN_DIR/coverage.out" -o "$RUN_DIR/coverage.html"
+go tool cover "-func=$RUN_DIR/coverage.out"
 
 rm -rf "$TEMP_DIR"
 

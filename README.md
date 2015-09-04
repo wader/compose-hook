@@ -57,7 +57,7 @@ Use `--config` to use another filenamn than `compose-hook.yml`.
 
 I use compose-hook in combination with [nginx-proxy](https://github.com/jwilder/nginx-proxy).
 
-Run tests: `go build && test/run $PWD/compose-hook $PWD/test`
+Run tests: `test/run`
 
 Add config to cleanup images and containers.
 

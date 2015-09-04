@@ -12,4 +12,3 @@ exit
 EXPECTED
 remote: compose-hook: yaml: unmarshal errors:
 remote:   line 1: cannot unmarshal !!str `bla` into main.branchConfigs
- ! [remote rejected] master -> master (pre-receive hook declined)

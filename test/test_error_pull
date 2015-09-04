@@ -16,4 +16,3 @@ EXPECTED
 remote: compose-hook: master COMPOSE_PROJECT_NAME=a
 remote: compose-hook: docker-compose pull
 remote: compose-hook: exit status 1
- ! [remote rejected] master -> master (pre-receive hook declined)

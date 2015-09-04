@@ -18,4 +18,3 @@ remote: compose-hook: docker-compose pull
 remote: pull
 remote: compose-hook: docker-compose build
 remote: compose-hook: exit status 1
- ! [remote rejected] master -> master (pre-receive hook declined)

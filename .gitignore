@@ -1,1 +1,4 @@
 compose-hook
+compose-hook.test
+coverage.html
+coverage.out
