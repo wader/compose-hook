@@ -86,6 +86,14 @@ else
   for t in $(cd $TESTS_DIR; echo test_*) ; do
      run_test "$t"
   done
+
+  echo -n "Test that failure exits non-zero..."
+  if "$RUN_DIR"/compose-hook a 1>/dev/null ; then
+    echo "FAILED"
+    exit 1
+  else
+    echo "PASS"
+  fi
 fi
 
 gocovmerge "$COVER_DIR"/*.out > "$RUN_DIR/coverage.out"
